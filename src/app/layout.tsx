@@ -1,8 +1,5 @@
 // import "@/styles/globals.css";
 // import Navbar from "@/components/layout/Navbar";
-
-import AnimationHello from "@/component/animation/animation";
-import Navbar from "@/component/layout/navbar";
 import css from "@/global/global.module.css";
 export default function RootLayout({
   children,

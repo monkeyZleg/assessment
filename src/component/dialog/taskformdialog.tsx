@@ -3,11 +3,11 @@ import CloseIcon from '@mui/icons-material/Close';
 interface Props {
     open: boolean;
     onClose: () => void;
-    onSubmit: (e: any) => void;
+    // onSubmit: (e: any) => void;
 }
 
 export default function TaskformDialog(props: Props) {
-    const { open, onClose, onSubmit } = props;
+    const { open, onClose } = props;
     return (
         <Dialog open={open} maxWidth={'md'}>
             <DialogContent>
@@ -27,9 +27,9 @@ export default function TaskformDialog(props: Props) {
                         Task form content goes here.
                     </Grid>
                     <Grid>
-                        <Button variant="contained" onClick={onSubmit}>
+                        {/* <Button variant="contained" onClick={onSubmit}>
                             Submit
-                        </Button>
+                        </Button> */}
                     </Grid>
                 </Grid>
             </DialogContent>
