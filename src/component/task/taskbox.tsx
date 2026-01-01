@@ -4,15 +4,16 @@ import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
 interface TaskboxProps {
     onRemove: () => void;
     onOpen?: () => void;
+    taskTitle?: string;
 }
 
 export function Taskbox(props: TaskboxProps) {
-    const { onRemove, onOpen } = props;
+    const { onRemove, onOpen, taskTitle } = props;
 
     const handleAddTask = () => {
         console.log("Add task clicked");
     }
-    
+
     return (
         <Card
             onClick={onOpen}
@@ -28,7 +29,7 @@ export function Taskbox(props: TaskboxProps) {
             <CardContent>
                 <Grid justifyContent="space-between" display="flex" alignItems="center">
                     <Typography variant="body2">
-                        This is a sample task box.
+                        {taskTitle}
                     </Typography>
                     <IconButton
                         onClick={(e) => {

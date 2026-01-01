@@ -1,20 +1,45 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, TextField } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import * as yup from "yup";
 import { useState } from "react";
-
 interface Props {
     open: boolean;
     onClose: () => void;
-    onAdding: (title: string) => void;
+    setTaskTitle: (title: string) => void;
+    taskTitle: string;
+    handleAddingCard: (title: string) => void;
 }
 export default function CardDialog(props: Props) {
-    const [taskTitle, setTaskTitle] = useState<string>("");
-    const { open, onClose, onAdding } = props;
+    const { open, onClose, taskTitle, setTaskTitle, handleAddingCard } = props;
+    const [error, setError] = useState<string | null>(null);
 
     const handleChange = (e: any) => {
+        console.log(e.target.value);
         setTaskTitle(e.target.value);
-        console.log(e.target.value, 'title');
     }
+
+    const cardSchema = yup.object({
+        title: yup
+            .string()
+            .required("Card title is required")
+            .min(3, "Title must be at least 3 characters"),
+    });
+
+    const onAdd = async () => {
+        try {
+            await cardSchema.validate(
+                { title: taskTitle },
+                { abortEarly: false }
+            );
+
+            setError(null);
+            handleAddingCard(taskTitle);
+            onClose();
+        } catch (err: any) {
+            setError(err.errors[0]);
+        }
+    };
+
 
     return (
         <Dialog open={open} maxWidth={'sm'}>
@@ -38,12 +63,14 @@ export default function CardDialog(props: Props) {
                                     value={taskTitle}
                                     onChange={handleChange}
                                     fullWidth
+                                    error={!!error}
+                                    helperText={error}
                                 />
                             </Grid>
                         </DialogContent>
                     </Grid>
                     <Grid size={12} display="flex" justifyContent="flex-end">
-                        <Button variant="contained" >
+                        <Button variant="contained" onClick={onAdd}>
                             Add
                         </Button>
                     </Grid>

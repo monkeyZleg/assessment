@@ -9,44 +9,25 @@ export default function Tasklist() {
     const [tasks, setTasks] = useState<any[]>([]);
     const [tasksIndex, setTasksIndex] = useState<number[]>([]);
     const [open, setOpen] = useState<boolean>(false);
-
+    const list = [];
     const [taskOpen, setTaskOpen] = useState<boolean>(false);
+    const [taskTitle, setTaskTitle] = useState<string>("");
+    const [taskDescription, setTaskDescription] = useState<string>("");
 
-    const taskStatus = [
-        "New",
-        "In Progress",
-        "Resolved",
-        "Closed"
-    ]
-
-    const taskType = [
-        "New Task",
-        "Bug",
-        "Improvement",
-        "Feature Request",
-        "Change Request",
-        "Other"
-    ]
+    
 
     useEffect(() => {
 
     }, []);
 
     const handleOpenCardDialog = (e: any) => {
-        // setTasks((prev) => [...prev, prev.length]);
         setTaskOpen(true);
     };
 
-    const handleAddingCard = async (title: string) => {
+    const handleAddingCard = async () => {
         try {
             setTasksIndex((prev) => [...prev, prev.length]);
             setTaskOpen(false);
-            tasks.push(
-                {
-                    title: title,
-
-                }
-            );
         } catch (error) {
             throw error;
         }
@@ -105,8 +86,9 @@ export default function Tasklist() {
                     {tasksIndex.map((_, index) => (
                         <Taskbox
                             key={index}
-                            onRemove={() => handleRemoveCard(index)}
                             onOpen={handleOpenDialog}
+                            onRemove={() => handleRemoveCard(index)}
+                            taskTitle={taskTitle}
                         />
                     ))}
                 </Stack>
@@ -114,11 +96,16 @@ export default function Tasklist() {
             <CardDialog
                 open={taskOpen}
                 onClose={() => setTaskOpen(false)}
-                onAdding={(title) => handleAddingCard(title)}
+                setTaskTitle={setTaskTitle}
+                taskTitle={taskTitle}
+                handleAddingCard={handleAddingCard}
             />
             <TaskformDialog
                 open={open}
                 onClose={() => setOpen(false)}
+                taskTitle={taskTitle}
+                setTaskDescription={setTaskDescription}
+                taskDescription={taskDescription}
             />
         </Box>
     );
