@@ -14,7 +14,6 @@ export default function CardDialog(props: Props) {
     const [error, setError] = useState<string | null>(null);
 
     const handleChange = (e: any) => {
-        console.log(e.target.value);
         setTaskTitle(e.target.value);
     }
 
