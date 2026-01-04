@@ -11,7 +11,6 @@ export default function Tasklist() {
     const [cards, setCards] = useState<TaskCard[]>([]);
     const [openCardId, setOpenCardId] = useState<number | null>(null);
     const [taskOpen, setTaskOpen] = useState<boolean>(false);
-    // const [taskTitle, setTaskTitle] = useState<string>("");
 
     const handleOpenCardDialog = (e: any) => {
         setTaskOpen(true);
@@ -101,8 +100,6 @@ export default function Tasklist() {
                 <CardDialog
                     open={taskOpen}
                     onClose={() => setTaskOpen(false)}
-                    // setTaskTitle={setTaskTitle}
-                    // taskTitle={taskTitle}
                     handleAddingCard={handleAddingCard}
                 />
                 {cards.map((card) => (
