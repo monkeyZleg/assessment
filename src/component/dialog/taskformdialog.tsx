@@ -4,8 +4,8 @@ import AddCommentIcon from '@mui/icons-material/AddComment';
 import { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
-
+import toast from "react-hot-toast";
+import * as yup from "yup";
 interface Props {
     open: boolean;
     onClose: () => void;
@@ -16,12 +16,19 @@ interface Props {
     onRemove: () => void;
 }
 
+interface FormErrors {
+    description?: string;
+    type?: string;
+    status?: string;
+}
+
 export default function TaskformDialog(props: Props) {
     const { open, onClose, title, activeNumberId, setCards, cards, onRemove } = props;
     const [description, setDescription] = useState<string>("");
     const [status, setStatus] = useState<string>("");
     const [type, setType] = useState<string>("");
     const [formData, setFormData] = useState<any>({});
+    const [errors, setErrors] = useState<FormErrors>({});
 
     useEffect(() => {
         if (open) {
@@ -71,8 +78,34 @@ export default function TaskformDialog(props: Props) {
         }
     }
 
+    const cardSchema = yup.object({
+        description: yup
+            .string()
+            .required("Description is required"),
+
+        type: yup
+            .string()
+            .required("Type is required"),
+
+        status: yup
+            .string()
+            .required("Status is required"),
+    });
+
     const handleSubmit = async () => {
         try {
+            setErrors({});
+
+            await cardSchema.validate(
+                {
+                    title,
+                    description: formData.description,
+                    type: formData.type,
+                    status: formData.status,
+                },
+                { abortEarly: false }
+            );
+
             setCards((prevCards: any) =>
                 prevCards.map((card: any) =>
                     card.id === activeNumberId
@@ -85,12 +118,27 @@ export default function TaskformDialog(props: Props) {
                         : card
                 )
             );
+
             onClose();
-            toast.success('Successfully Add Task!');
+            toast.success("Successfully updated task!");
         } catch (e: any) {
-            toast.error('This is an error!');
+            if (e.name === "ValidationError") {
+                const fieldErrors: FormErrors = {};
+
+                e.inner.forEach((err: any) => {
+                    if (err.path) {
+                        fieldErrors[err.path as keyof FormErrors] = err.message;
+                    }
+                });
+
+                setErrors(fieldErrors);
+            } else {
+                toast.error(e.message || "Unexpected error");
+            }
         }
+
     }
+
 
     const handleDelete = () => {
         try {
@@ -122,7 +170,13 @@ export default function TaskformDialog(props: Props) {
                                 value={type || cards.find(card => card.id === activeNumberId)?.type || ""}
                                 onChange={(event, newValue) => handleChange("type", newValue)}
                                 getOptionLabel={(option) => option || ""}
-                                renderInput={(params) => <TextField {...params} label="Type" />}
+                                renderInput={(params) => (
+                                    <TextField {...params}
+                                        label="Status"
+                                        error={errors.type ? true : false}
+                                        helperText={errors.type ? 'Please select a type' : null}
+                                    />
+                                )}
                             />
                         </Grid>
 
@@ -133,7 +187,13 @@ export default function TaskformDialog(props: Props) {
                                 value={status || cards.find(card => card.id === activeNumberId)?.status || ""}
                                 onChange={(event, newValue) => handleChange("status", newValue)}
                                 getOptionLabel={(option) => option || ""}
-                                renderInput={(params) => <TextField {...params} label="Status" />}
+                                renderInput={(params) => (
+                                    <TextField {...params}
+                                        label="Status"
+                                        error={errors.status ? true : false}
+                                        helperText={errors.status ? 'Please select a status' : null}
+                                    />
+                                )}
                             />
                         </Grid>
 
@@ -146,6 +206,8 @@ export default function TaskformDialog(props: Props) {
                             fullWidth
                             multiline
                             rows={4}
+                            error={errors.description ? true : false}
+                            helperText={errors.description ? 'Please add description before submit' : null}
                             slotProps={{
                                 input: {
                                     startAdornment: (
@@ -157,7 +219,7 @@ export default function TaskformDialog(props: Props) {
                             }}
                         />
                     </Grid>
-                    <Grid>
+                    <Grid size={12}>
                         <Button variant="contained" onClick={handleSubmit}>
                             Submit
                         </Button>
@@ -167,7 +229,6 @@ export default function TaskformDialog(props: Props) {
                     </Grid>
                 </Grid>
             </DialogContent>
-            
         </Dialog >
     )
 }

@@ -13,8 +13,6 @@ export default function Tasklist() {
     const [taskOpen, setTaskOpen] = useState<boolean>(false);
     const [taskTitle, setTaskTitle] = useState<string>("");
 
-
-
     const handleOpenCardDialog = (e: any) => {
         setTaskOpen(true);
     };
@@ -62,7 +60,7 @@ export default function Tasklist() {
                             }}
                         >
                             <Typography variant="body2">
-                                This is a sample home page using Material-UI components.
+                                This is a sample home page task management
                             </Typography>
 
                             <Button onClick={handleOpenCardDialog} variant="contained" color="primary">
