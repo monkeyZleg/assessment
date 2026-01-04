@@ -2,20 +2,20 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconBu
 import CloseIcon from '@mui/icons-material/Close';
 import * as yup from "yup";
 import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 interface Props {
     open: boolean;
     onClose: () => void;
-    setTaskTitle: (title: string) => void;
-    taskTitle: string;
     handleAddingCard: (title: string) => void;
 }
-export default function CardDialog(props: Props) {
-    const { open, onClose, taskTitle, setTaskTitle, handleAddingCard } = props;
-    const [error, setError] = useState<string | null>(null);
+interface FormValues {
+    title: string;
+}
 
-    const handleChange = (e: any) => {
-        setTaskTitle(e.target.value);
-    }
+export default function CardDialog(props: Props) {
+    const { open, onClose, handleAddingCard } = props;
+    const [error, setError] = useState<string | null>(null);
 
     const cardSchema = yup.object({
         title: yup
@@ -24,16 +24,21 @@ export default function CardDialog(props: Props) {
             .min(3, "Title must be at least 3 characters"),
     });
 
-    const onAdd = async () => {
-        try {
-            await cardSchema.validate(
-                { title: taskTitle },
-                { abortEarly: false }
-            );
+    const {
+        control,
+        handleSubmit,
+        reset,
+    } = useForm<FormValues>({
+        resolver: yupResolver(cardSchema),
+        defaultValues: { title: "" },
+    });
 
+    const onAdd = async (data: FormValues) => {
+        try {
             setError(null);
-            handleAddingCard(taskTitle);
+            handleAddingCard(data.title);
             onClose();
+            reset();
         } catch (err: any) {
             setError(err.errors[0]);
         }
@@ -41,7 +46,15 @@ export default function CardDialog(props: Props) {
 
 
     return (
-        <Dialog open={open} maxWidth={'sm'}>
+        <Dialog
+            open={open}
+            maxWidth={'sm'}
+            onClose={(event, reason) => {
+                if (reason === "backdropClick") {
+                    onClose();
+                }
+            }}
+        >
             <DialogContent>
                 <Grid container spacing={1}>
                     <Grid size={12} display="flex" justifyContent="space-between">
@@ -57,19 +70,31 @@ export default function CardDialog(props: Props) {
                     <Grid size={12}>
                         <DialogContent>
                             <Grid size={12}>
-                                <TextField
-                                    label="Card Title"
-                                    value={taskTitle}
-                                    onChange={handleChange}
-                                    fullWidth
-                                    error={!!error}
-                                    helperText={error}
+
+                                <Controller
+                                    name="title"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        // <TextField
+                                        // label="Card Title"
+                                        // fullWidth
+                                        // error={!!fieldState.error}
+                                        // helperText={fieldState.error?.message}
+                                        // />
+                                        <TextField
+                                            {...field}
+                                            label="Card Title"
+                                            fullWidth
+                                            error={!!error}
+                                            helperText={error}
+                                        />
+                                    )}
                                 />
                             </Grid>
                         </DialogContent>
                     </Grid>
                     <Grid size={12} display="flex" justifyContent="flex-end">
-                        <Button variant="contained" onClick={onAdd}>
+                        <Button variant="contained" onClick={handleSubmit(onAdd)}>
                             Add
                         </Button>
                     </Grid>

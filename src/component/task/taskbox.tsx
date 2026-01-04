@@ -96,7 +96,7 @@ export function Taskbox(props: TaskboxProps) {
                 "&:hover": {
                     transform: "translateY(-2px)",
                     boxShadow: 4,
-                    backgroundColor: "#f9f9f9",
+                    backgroundColor: "#f9f9f9ff",
                 },
             }}
         >

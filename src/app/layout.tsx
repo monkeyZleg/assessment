@@ -1,18 +1,30 @@
-// import "@/styles/globals.css";
-// import Navbar from "@/components/layout/Navbar";
+"use client";
+import * as React from "react";
 import css from "@/global/global.module.css";
-export default function RootLayout({
+import { CacheProvider } from "@emotion/react";
+import createCache from "@emotion/cache";
+import { CssBaseline } from "@mui/material";
+
+const cache = createCache({
+  key: "mui",
+  prepend: true,
+});
+
+export default function ThemeRegistry({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={css.body}>
-        <div className={css.main}>
-          {children}
-        </div>
-      </body>
-    </html>
+    <CacheProvider value={cache}>
+      <CssBaseline />
+      <html lang="en">
+        <body className={css.body}>
+          <div className={css.main}>
+            {children}
+          </div>
+        </body>
+      </html>
+    </CacheProvider>
   );
 }
